@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 //After Active the plugin, the table will be create;
-function after_activation(){
+function after_activation() {
 	global $wpdb, $table_prefix;
 	$table_name = $table_prefix . 'bisnu';
 	$query      = "CREATE TABLE $table_name (
@@ -34,3 +34,33 @@ function after_deactivation() {
 }
 
 register_deactivation_hook( __FILE__, 'after_deactivation' );
+
+function show_latest_posts() {
+	$arg    = array(
+		'post_type'      => 'post',
+		'posts_per_page' => 5
+	);
+	$result = new WP_Query( $arg );
+
+	ob_start();
+	?>
+    <h3>Latest 10 Posts</h3>
+	<?php
+	while ( $result->have_posts() ):
+		$result->the_post();
+		?>
+        <li>
+            <a href="<?php echo get_the_permalink(); ?>">
+				<?php echo get_the_title(); ?>
+            </a>
+            <p>
+                <span><?php echo get_the_date(); ?></span>
+            </p>
+        </li>
+	<?php
+	endwhile;
+	$html = ob_get_clean();
+	echo $html;
+}
+
+add_shortcode( 'bisnu_latest_post', 'show_latest_posts' );
